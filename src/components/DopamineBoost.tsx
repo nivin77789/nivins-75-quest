@@ -17,7 +17,8 @@ const DOPAMINE_TASKS = [
 ];
 
 export const DopamineBoost = ({ tasks, onTaskChange }: DopamineBoostProps) => {
-  const completedCount = Object.values(tasks).filter(Boolean).length;
+  const safeTasks = tasks || {};
+  const completedCount = Object.values(safeTasks).filter(Boolean).length;
   const totalCount = DOPAMINE_TASKS.length;
   const progress = (completedCount / totalCount) * 100;
 
@@ -52,7 +53,7 @@ export const DopamineBoost = ({ tasks, onTaskChange }: DopamineBoostProps) => {
             key={task.id}
             id={task.id}
             label={task.label}
-            checked={tasks[task.id] || false}
+            checked={safeTasks[task.id] || false}
             onChange={(checked) => onTaskChange(task.id, checked)}
             icon={task.icon}
           />

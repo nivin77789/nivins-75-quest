@@ -35,7 +35,9 @@ export const WorkoutPlan = ({ workouts, onWorkoutChange, currentDate }: WorkoutP
   const isHomeWorkout = dayNumber <= 15;
   const workoutList = isHomeWorkout ? HOME_WORKOUTS : GYM_WORKOUTS;
   
-  const completedCount = Object.values(workouts).filter(Boolean).length;
+  // Safely handle workouts object
+  const safeWorkouts = workouts || {};
+  const completedCount = Object.values(safeWorkouts).filter(Boolean).length;
   const totalCount = workoutList.length;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
@@ -95,7 +97,7 @@ export const WorkoutPlan = ({ workouts, onWorkoutChange, currentDate }: WorkoutP
               key={workout.id}
               id={workout.id}
               label={workout.label}
-              checked={workouts[workout.id] || false}
+              checked={safeWorkouts[workout.id] || false}
               onChange={(checked) => onWorkoutChange(workout.id, checked)}
             />
           ))}

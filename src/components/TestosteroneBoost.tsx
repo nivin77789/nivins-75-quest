@@ -17,7 +17,8 @@ const TESTOSTERONE_TASKS = [
 ];
 
 export const TestosteroneBoost = ({ tasks, onTaskChange }: TestosteroneBoostProps) => {
-  const completedCount = Object.values(tasks).filter(Boolean).length;
+  const safeTasks = tasks || {};
+  const completedCount = Object.values(safeTasks).filter(Boolean).length;
   const totalCount = TESTOSTERONE_TASKS.length;
   const progress = (completedCount / totalCount) * 100;
 
@@ -52,7 +53,7 @@ export const TestosteroneBoost = ({ tasks, onTaskChange }: TestosteroneBoostProp
             key={task.id}
             id={task.id}
             label={task.label}
-            checked={tasks[task.id] || false}
+            checked={safeTasks[task.id] || false}
             onChange={(checked) => onTaskChange(task.id, checked)}
             icon={task.icon}
           />
