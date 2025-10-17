@@ -1,11 +1,224 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect } from "react";
+import { format, differenceInDays } from "date-fns";
+import { db } from "@/lib/firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { USER_INFO, LOOKMAXING_TASKS, MOTIVATIONAL_QUOTES, ATOMIC_HABITS_CONTENT } from "@/lib/constants";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { DailyTasks } from "@/components/DailyTasks";
+import { LookmaxingTask } from "@/components/LookmaxingTask";
+import { WaterTracker } from "@/components/WaterTracker";
+import { WeightTracker } from "@/components/WeightTracker";
+import { MotivationalQuote } from "@/components/MotivationalQuote";
+import { AtomicHabits } from "@/components/AtomicHabits";
+import { DailyNotes } from "@/components/DailyNotes";
+import { Calendar, Target, Trophy, Flame } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import confetti from "canvas-confetti";
+import { useToast } from "@/hooks/use-toast";
+
+interface DayData {
+  date: string;
+  tasks: Record<string, boolean>;
+  lookmaxingDone: boolean;
+  waterIntake: number;
+  weight: number;
+  notes: string;
+}
 
 const Index = () => {
+  const { toast } = useToast();
+  const today = format(new Date(), "yyyy-MM-dd");
+  const dayNumber = differenceInDays(new Date(today), new Date(USER_INFO.startDate)) + 1;
+  const daysRemaining = differenceInDays(new Date(USER_INFO.endDate), new Date(today));
+  
+  const [dayData, setDayData] = useState<DayData>({
+    date: today,
+    tasks: {},
+    lookmaxingDone: false,
+    waterIntake: 0,
+    weight: USER_INFO.initialWeight,
+    notes: ""
+  });
+
+  const [tempWeight, setTempWeight] = useState(USER_INFO.initialWeight);
+
+  useEffect(() => {
+    const loadDayData = async () => {
+      const docRef = doc(db, "dailyData", today);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        setDayData(docSnap.data() as DayData);
+        setTempWeight(docSnap.data().weight);
+      }
+    };
+
+    loadDayData();
+  }, [today]);
+
+  const saveDayData = async (newData: Partial<DayData>) => {
+    const updatedData = { ...dayData, ...newData, date: today };
+    setDayData(updatedData);
+    
+    try {
+      await setDoc(doc(db, "dailyData", today), updatedData);
+    } catch (error) {
+      toast({
+        title: "Error saving data",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleTaskChange = (taskId: string, checked: boolean) => {
+    const newTasks = { ...dayData.tasks, [taskId]: checked };
+    saveDayData({ tasks: newTasks });
+
+    // Check if all tasks are completed
+    const allTasksCompleted = Object.keys(newTasks).length === 9 && Object.values(newTasks).every(Boolean);
+    if (allTasksCompleted && dayData.lookmaxingDone && dayData.waterIntake >= 3.8) {
+      confetti({
+        particleCount: 200,
+        spread: 180,
+        origin: { y: 0.5 },
+        colors: ['#a855f7', '#3b82f6', '#10b981', '#fbbf24']
+      });
+      toast({
+        title: "🎉 ALL TASKS COMPLETED!",
+        description: "You're crushing it! Keep the momentum going!",
+      });
+    }
+  };
+
+  const lookmaxingTask = LOOKMAXING_TASKS[dayNumber % LOOKMAXING_TASKS.length];
+  const quote = MOTIVATIONAL_QUOTES[dayNumber % MOTIVATIONAL_QUOTES.length];
+  const atomicHabitsDay = ATOMIC_HABITS_CONTENT[Math.min(dayNumber - 1, ATOMIC_HABITS_CONTENT.length - 1)];
+
+  const totalTasks = 9;
+  const completedTasks = Object.values(dayData.tasks).filter(Boolean).length;
+  const tasksProgress = (completedTasks / totalTasks) * 100;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background pb-20">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full gradient-primary">
+              <Trophy className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold">{USER_INFO.name}</h1>
+              <p className="text-sm text-muted-foreground">75 Hard Challenge</p>
+            </div>
+          </div>
+          <ThemeToggle />
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Motivational Quote */}
+        <div className="mb-8">
+          <MotivationalQuote quote={quote} />
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card className="card-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Day</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                <span className="text-3xl font-bold">{dayNumber}</span>
+                <span className="text-lg text-muted-foreground">/ 76</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Days Remaining</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-secondary" />
+                <span className="text-3xl font-bold">{daysRemaining}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Today's Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <Flame className="h-5 w-5 text-accent" />
+                <span className="text-3xl font-bold">{tasksProgress.toFixed(0)}%</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Current Weight</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <span className="text-3xl font-bold">{dayData.weight}</span>
+                <span className="text-lg text-muted-foreground">kg</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-6">
+            <DailyTasks 
+              tasks={dayData.tasks}
+              onTaskChange={handleTaskChange}
+            />
+
+            <LookmaxingTask
+              task={lookmaxingTask}
+              completed={dayData.lookmaxingDone}
+              onComplete={(checked) => saveDayData({ lookmaxingDone: checked })}
+            />
+
+            <AtomicHabits content={atomicHabitsDay} />
+
+            <DailyNotes
+              notes={dayData.notes}
+              onNotesChange={(notes) => saveDayData({ notes })}
+            />
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            <WaterTracker
+              waterIntake={dayData.waterIntake}
+              onWaterChange={(liters) => saveDayData({ waterIntake: liters })}
+            />
+
+            <WeightTracker
+              currentWeight={dayData.weight}
+              onWeightUpdate={(weight) => {
+                saveDayData({ weight });
+                toast({
+                  title: "Weight updated!",
+                  description: `New weight: ${weight} kg`,
+                });
+              }}
+              tempWeight={tempWeight}
+              onTempWeightChange={setTempWeight}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
