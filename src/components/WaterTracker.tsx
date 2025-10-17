@@ -27,7 +27,7 @@ export const WaterTracker = ({ waterIntake, onWaterChange }: WaterTrackerProps) 
         <div className="flex items-center justify-center">
           <ProgressRing progress={progress} size={140} strokeWidth={10}>
             <div className="text-center">
-              <div className="text-3xl font-bold gradient-primary bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-clip-text text-grey">
                 {waterIntake.toFixed(1)}L
               </div>
               <div className="text-sm text-muted-foreground">

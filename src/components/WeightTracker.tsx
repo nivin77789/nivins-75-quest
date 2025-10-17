@@ -60,15 +60,20 @@ export const WeightTracker = ({ currentWeight, onWeightUpdate, tempWeight, onTem
           </label>
           <div className="flex gap-2">
             <Input
-              id="weight-input"
-              type="number"
-              step="0.1"
-              min="30"
-              max="200"
-              value={tempWeight}
-              onChange={(e) => onTempWeightChange(parseFloat(e.target.value) || currentWeight)}
-              className="text-center font-semibold"
-            />
+  id="weight-input"
+  type="number"
+  step="0.1"
+  min="30"
+  max="200"
+  value={tempWeight || ""}
+  onChange={(e) => {
+    const value = e.target.value;
+    onTempWeightChange(value === "" ? NaN : parseFloat(value));
+  }}
+  placeholder="Enter weight"
+  className="text-center font-semibold"
+/>
+
             <Button 
               onClick={() => onWeightUpdate(tempWeight)}
               className="gradient-primary"

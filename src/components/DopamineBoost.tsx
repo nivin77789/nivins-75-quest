@@ -34,7 +34,7 @@ export const DopamineBoost = ({ tasks, onTaskChange }: DopamineBoostProps) => {
             <CardDescription>Natural dopamine increasers</CardDescription>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold gradient-accent bg-clip-text text-transparent">
+            <div className="text-2xl font-bold bg-clip-text text-grey">
               {completedCount}/{totalCount}
             </div>
             <div className="text-sm text-muted-foreground">completed</div>

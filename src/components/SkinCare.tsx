@@ -71,7 +71,7 @@ export const SkinCare = ({ tasks, onTaskChange }: SkinCareProps) => {
             <CardDescription>Day & Night skincare regimen</CardDescription>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
+            <div className="text-2xl font-bold bg-clip-text text-grey">
               {completedCount}/{totalCount}
             </div>
             <div className="text-xs text-muted-foreground">completed</div>

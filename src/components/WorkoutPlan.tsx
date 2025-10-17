@@ -67,7 +67,7 @@ export const WorkoutPlan = ({ workouts, onWorkoutChange, currentDate }: WorkoutP
             </div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold gradient-primary bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-clip-text text-grey">
               {completedCount}/{totalCount}
             </div>
             <div className="text-sm text-muted-foreground">completed</div>
