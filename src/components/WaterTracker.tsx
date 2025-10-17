@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Droplet } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 
@@ -39,17 +39,16 @@ export const WaterTracker = ({ waterIntake, onWaterChange }: WaterTrackerProps) 
         
         <div className="space-y-2">
           <label htmlFor="water-input" className="text-sm font-medium">
-            Enter today's intake (liters)
+            Today's water intake
           </label>
-          <Input
+          <NumberInput
             id="water-input"
-            type="number"
-            step="0.1"
-            min="0"
-            max="10"
             value={waterIntake}
-            onChange={(e) => onWaterChange(parseFloat(e.target.value) || 0)}
-            className="text-center text-lg font-semibold"
+            onChange={onWaterChange}
+            min={0}
+            max={10}
+            step={0.1}
+            unit="L"
           />
         </div>
 

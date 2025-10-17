@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskCheckbox } from "./TaskCheckbox";
-import { Apple, Droplet, Dumbbell, TreePine, BookOpen, Camera, Heart, Cigarette, Candy } from "lucide-react";
+import { Apple, Droplet, Dumbbell, TreePine, BookOpen, Camera, Heart, Cigarette, Candy, Lightbulb } from "lucide-react";
 
 interface DailyTasksProps {
   tasks: Record<string, boolean>;
@@ -14,6 +14,7 @@ const TASK_LIST = [
   { id: "workout2", label: "45-min outdoor workout", icon: <TreePine className="h-4 w-4" /> },
   { id: "reading", label: "Read 10 pages (Atomic Habits)", icon: <BookOpen className="h-4 w-4" /> },
   { id: "photo", label: "Take daily progress photo", icon: <Camera className="h-4 w-4" /> },
+  { id: "learnNew", label: "Learn something new", icon: <Lightbulb className="h-4 w-4" /> },
   { id: "noFap", label: "No fap", icon: <Heart className="h-4 w-4" /> },
   { id: "noCigarette", label: "No cigarette", icon: <Cigarette className="h-4 w-4" /> },
   { id: "sugarCut", label: "Sugar cut", icon: <Candy className="h-4 w-4" /> },

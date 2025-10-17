@@ -12,7 +12,7 @@ import { MotivationalQuote } from "@/components/MotivationalQuote";
 import { AtomicHabits } from "@/components/AtomicHabits";
 import { DailyNotes } from "@/components/DailyNotes";
 import { DopamineBoost } from "@/components/DopamineBoost";
-import { TestosteroneBoost } from "@/components/TestosteroneBoost";
+import { SkinCare } from "@/components/SkinCare";
 import { WorkoutPlan } from "@/components/WorkoutPlan";
 import { StepsTracker } from "@/components/StepsTracker";
 import { Calendar, Target, Trophy, Flame } from "lucide-react";
@@ -28,7 +28,7 @@ interface DayData {
   weight: number;
   notes: string;
   dopamineTasks: Record<string, boolean>;
-  testosteroneTasks: Record<string, boolean>;
+  skincareTasks: Record<string, boolean>;
   workouts: Record<string, boolean>;
   dailySteps: number;
 }
@@ -47,7 +47,7 @@ const Index = () => {
     weight: USER_INFO.initialWeight,
     notes: "",
     dopamineTasks: {},
-    testosteroneTasks: {},
+    skincareTasks: {},
     workouts: {},
     dailySteps: 0
   });
@@ -88,7 +88,7 @@ const Index = () => {
     saveDayData({ tasks: newTasks });
 
     // Check if all tasks are completed
-    const allTasksCompleted = Object.keys(newTasks).length === 9 && Object.values(newTasks).every(Boolean);
+    const allTasksCompleted = Object.keys(newTasks).length === 10 && Object.values(newTasks).every(Boolean);
     if (allTasksCompleted && dayData.lookmaxingDone && dayData.waterIntake >= 3.8) {
       confetti({
         particleCount: 200,
@@ -107,7 +107,7 @@ const Index = () => {
   const quote = MOTIVATIONAL_QUOTES[dayNumber % MOTIVATIONAL_QUOTES.length];
   const atomicHabitsDay = ATOMIC_HABITS_CONTENT[Math.min(dayNumber - 1, ATOMIC_HABITS_CONTENT.length - 1)];
 
-  const totalTasks = 9;
+  const totalTasks = 10;
   const completedTasks = Object.values(dayData.tasks).filter(Boolean).length;
   const tasksProgress = (completedTasks / totalTasks) * 100;
 
@@ -219,11 +219,11 @@ const Index = () => {
               }}
             />
 
-            <TestosteroneBoost
-              tasks={dayData.testosteroneTasks}
+            <SkinCare
+              tasks={dayData.skincareTasks}
               onTaskChange={(taskId, checked) => {
-                const newTasks = { ...dayData.testosteroneTasks, [taskId]: checked };
-                saveDayData({ testosteroneTasks: newTasks });
+                const newTasks = { ...dayData.skincareTasks, [taskId]: checked };
+                saveDayData({ skincareTasks: newTasks });
               }}
             />
 
