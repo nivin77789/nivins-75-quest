@@ -11,6 +11,10 @@ import { WeightTracker } from "@/components/WeightTracker";
 import { MotivationalQuote } from "@/components/MotivationalQuote";
 import { AtomicHabits } from "@/components/AtomicHabits";
 import { DailyNotes } from "@/components/DailyNotes";
+import { DopamineBoost } from "@/components/DopamineBoost";
+import { TestosteroneBoost } from "@/components/TestosteroneBoost";
+import { WorkoutPlan } from "@/components/WorkoutPlan";
+import { StepsTracker } from "@/components/StepsTracker";
 import { Calendar, Target, Trophy, Flame } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import confetti from "canvas-confetti";
@@ -23,6 +27,10 @@ interface DayData {
   waterIntake: number;
   weight: number;
   notes: string;
+  dopamineTasks: Record<string, boolean>;
+  testosteroneTasks: Record<string, boolean>;
+  workouts: Record<string, boolean>;
+  dailySteps: number;
 }
 
 const Index = () => {
@@ -37,7 +45,11 @@ const Index = () => {
     lookmaxingDone: false,
     waterIntake: 0,
     weight: USER_INFO.initialWeight,
-    notes: ""
+    notes: "",
+    dopamineTasks: {},
+    testosteroneTasks: {},
+    workouts: {},
+    dailySteps: 0
   });
 
   const [tempWeight, setTempWeight] = useState(USER_INFO.initialWeight);
@@ -190,6 +202,31 @@ const Index = () => {
               onComplete={(checked) => saveDayData({ lookmaxingDone: checked })}
             />
 
+            <WorkoutPlan
+              workouts={dayData.workouts}
+              onWorkoutChange={(workoutId, checked) => {
+                const newWorkouts = { ...dayData.workouts, [workoutId]: checked };
+                saveDayData({ workouts: newWorkouts });
+              }}
+              currentDate={today}
+            />
+
+            <DopamineBoost
+              tasks={dayData.dopamineTasks}
+              onTaskChange={(taskId, checked) => {
+                const newTasks = { ...dayData.dopamineTasks, [taskId]: checked };
+                saveDayData({ dopamineTasks: newTasks });
+              }}
+            />
+
+            <TestosteroneBoost
+              tasks={dayData.testosteroneTasks}
+              onTaskChange={(taskId, checked) => {
+                const newTasks = { ...dayData.testosteroneTasks, [taskId]: checked };
+                saveDayData({ testosteroneTasks: newTasks });
+              }}
+            />
+
             <AtomicHabits content={atomicHabitsDay} />
 
             <DailyNotes
@@ -203,6 +240,12 @@ const Index = () => {
             <WaterTracker
               waterIntake={dayData.waterIntake}
               onWaterChange={(liters) => saveDayData({ waterIntake: liters })}
+            />
+
+            <StepsTracker
+              dailySteps={dayData.dailySteps}
+              onStepsChange={(steps) => saveDayData({ dailySteps: steps })}
+              currentDate={today}
             />
 
             <WeightTracker
