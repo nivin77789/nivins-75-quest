@@ -17,12 +17,12 @@ interface StepsTrackerProps {
 const DAILY_GOAL = 10000;
 
 export const StepsTracker = ({ dailySteps, onStepsChange, currentDate }: StepsTrackerProps) => {
-  const [stepsInput, setStepsInput] = useState(dailySteps.toString());
+  const [stepsInput, setStepsInput] = useState((dailySteps || 0).toString());
   const [totalDeficit, setTotalDeficit] = useState(0);
   const [overallProgress, setOverallProgress] = useState(100);
 
   useEffect(() => {
-    setStepsInput(dailySteps.toString());
+    setStepsInput((dailySteps || 0).toString());
   }, [dailySteps]);
 
   useEffect(() => {
@@ -64,9 +64,9 @@ export const StepsTracker = ({ dailySteps, onStepsChange, currentDate }: StepsTr
     onStepsChange(steps);
   };
 
-  const todayProgress = Math.min((dailySteps / DAILY_GOAL) * 100, 100);
-  const isComplete = dailySteps >= DAILY_GOAL;
-  const todayDeficit = Math.max(0, DAILY_GOAL - dailySteps);
+  const todayProgress = Math.min(((dailySteps || 0) / DAILY_GOAL) * 100, 100);
+  const isComplete = (dailySteps || 0) >= DAILY_GOAL;
+  const todayDeficit = Math.max(0, DAILY_GOAL - (dailySteps || 0));
   const remainingToBalance = totalDeficit + todayDeficit;
 
   return (
@@ -83,7 +83,7 @@ export const StepsTracker = ({ dailySteps, onStepsChange, currentDate }: StepsTr
           <ProgressRing progress={todayProgress} size={140} strokeWidth={10}>
             <div className="text-center">
               <div className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
-                {dailySteps.toLocaleString()}
+                {(dailySteps || 0).toLocaleString()}
               </div>
               <div className="text-xs text-muted-foreground">
                 {todayProgress.toFixed(0)}%
