@@ -5,6 +5,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import { LOOKMAXING_TASKS, MOTIVATIONAL_QUOTES, ATOMIC_HABITS_CONTENT } from "@/lib/constants";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { DailyTasks } from "@/components/DailyTasks";
 import { LookmaxingTask } from "@/components/LookmaxingTask";
 import { WaterTracker } from "@/components/WaterTracker";
@@ -137,7 +138,8 @@ const Index = () => {
   const tasksProgress = (completedTasks / totalTasks) * 100;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 relative">
+      <AnimatedBackground />
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">

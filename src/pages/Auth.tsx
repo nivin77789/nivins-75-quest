@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Trophy } from 'lucide-react';
 import { format, addDays } from 'date-fns';
+import { AnimatedBackground } from '@/components/AnimatedBackground';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -89,8 +90,9 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+      <AnimatedBackground />
+      <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center w-16 h-16 rounded-full gradient-primary mx-auto mb-4">
             <Trophy className="h-8 w-8 text-primary-foreground" />
