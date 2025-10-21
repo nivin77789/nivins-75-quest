@@ -138,7 +138,7 @@ const Index = () => {
   const tasksProgress = (completedTasks / totalTasks) * 100;
 
   return (
-    <div className="min-h-screen bg-background pb-20 relative">
+    <div className="min-h-screen  pb-20 relative">
       <AnimatedBackground />
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
