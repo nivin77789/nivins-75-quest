@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Footprints } from "lucide-react";
+import { Footprints, Plus, Minus } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
@@ -114,29 +114,33 @@ export const StepsTracker = ({
           </ProgressRing>
         </div>
 
-        {/* Stylish + / - Input Field */}
-        <div className="flex flex-col items-center justify-center space-y-2">
+        {/* Stylish Input Field with +/- buttons */}
+        <div className="space-y-3">
           <label
             htmlFor="steps-input"
-            className="text-sm font-medium text-gray-700 tracking-wide"
+            className="text-sm font-medium block text-center"
           >
-            Enter today's steps
+            Log your steps
           </label>
 
-          <div className="flex items-center justify-center gap-2">
-            <div className="flex items-center border rounded-lg bg-white shadow-sm overflow-hidden">
-              <button
-                type="button"
-                onClick={() =>
-                  setStepsInput((prev) =>
-                    Math.max(0, Number(prev || 0) - 100).toString()
-                  )
-                }
-                className="px-3 py-1 text-gray-600 hover:bg-gray-100 active:scale-95 transition-all text-sm"
-              >
-                −
-              </button>
+          <div className="flex items-center justify-center gap-3">
+            {/* Decrement Button */}
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                setStepsInput((prev) =>
+                  Math.max(0, Number(prev || 0) - 500).toString()
+                )
+              }
+              className="h-12 w-12 rounded-full border-2 hover:border-primary hover:bg-primary/10 transition-all duration-200 active:scale-95"
+            >
+              <Minus className="h-5 w-5" />
+            </Button>
 
+            {/* Input Field */}
+            <div className="relative">
               <input
                 id="steps-input"
                 type="number"
@@ -144,29 +148,37 @@ export const StepsTracker = ({
                 min="0"
                 value={stepsInput}
                 onChange={(e) => setStepsInput(e.target.value)}
-                placeholder="–––"
-                className="w-20 text-center text-sm font-semibold border-x bg-transparent focus:outline-none focus:ring-0"
+                placeholder="0"
+                className="w-32 h-12 text-center text-xl font-bold rounded-xl border-2 border-border bg-card focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 outline-none"
               />
-
-              <button
-                type="button"
-                onClick={() =>
-                  setStepsInput((prev) =>
-                    (Number(prev || 0) + 100).toString()
-                  )
-                }
-                className="px-3 py-1 text-gray-600 hover:bg-gray-100 active:scale-95 transition-all text-sm"
-              >
-                +
-              </button>
+              <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-muted-foreground whitespace-nowrap">
+                steps
+              </div>
             </div>
 
+            {/* Increment Button */}
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                setStepsInput((prev) =>
+                  (Number(prev || 0) + 500).toString()
+                )
+              }
+              className="h-12 w-12 rounded-full border-2 hover:border-primary hover:bg-primary/10 transition-all duration-200 active:scale-95"
+            >
+              <Plus className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-center pt-2">
             <Button
               onClick={handleSaveSteps}
-              size="sm"
-              className="rounded-md bg-blue-500 text-white font-medium text-sm px-4 py-1.5 hover:bg-blue-600 transition-all"
+              className="gradient-primary text-primary-foreground font-semibold px-8 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
             >
-              Save
+              Save Steps
             </Button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,9 +12,16 @@ import { format, addDays } from 'date-fns';
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signup, login } = useAuth();
+  const { signup, login, user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
