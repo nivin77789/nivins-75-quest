@@ -148,6 +148,10 @@ const Index = () => {
               <Trophy className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
+              <h1 className="text-xl font-bold">{userProfile.name}</h1>
+              <p className="text-sm text-muted-foreground">75 Hard Challenge</p>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <Button variant="outline" size="icon" onClick={handleLogout}>
