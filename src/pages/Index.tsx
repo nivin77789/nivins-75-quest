@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { format, differenceInDays } from "date-fns";
 import { db } from "@/lib/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { USER_INFO, LOOKMAXING_TASKS, MOTIVATIONAL_QUOTES, ATOMIC_HABITS_CONTENT } from "@/lib/constants";
+import { useAuth } from "@/hooks/useAuth";
+import { LOOKMAXING_TASKS, MOTIVATIONAL_QUOTES, ATOMIC_HABITS_CONTENT } from "@/lib/constants";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DailyTasks } from "@/components/DailyTasks";
 import { LookmaxingTask } from "@/components/LookmaxingTask";
@@ -15,10 +16,12 @@ import { DopamineBoost } from "@/components/DopamineBoost";
 import { SkinCare } from "@/components/SkinCare";
 import { WorkoutPlan } from "@/components/WorkoutPlan";
 import { StepsTracker } from "@/components/StepsTracker";
-import { Calendar, Target, Trophy, Flame } from "lucide-react";
+import { Calendar, Target, Trophy, Flame, LogOut } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import confetti from "canvas-confetti";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface DayData {
   date: string;
@@ -35,16 +38,21 @@ interface DayData {
 
 const Index = () => {
   const { toast } = useToast();
+  const { user, userProfile, logout } = useAuth();
+  const navigate = useNavigate();
   const today = format(new Date(), "yyyy-MM-dd");
-  const dayNumber = differenceInDays(new Date(today), new Date(USER_INFO.startDate)) + 1;
-  const daysRemaining = differenceInDays(new Date(USER_INFO.endDate), new Date(today));
+  
+  if (!userProfile) return null;
+  
+  const dayNumber = differenceInDays(new Date(today), new Date(userProfile.startDate)) + 1;
+  const daysRemaining = differenceInDays(new Date(userProfile.endDate), new Date(today));
   
   const [dayData, setDayData] = useState<DayData>({
     date: today,
     tasks: {},
     lookmaxingDone: false,
     waterIntake: 0,
-    weight: USER_INFO.initialWeight,
+    weight: userProfile.initialWeight,
     notes: "",
     dopamineTasks: {},
     skincareTasks: {},
@@ -52,11 +60,13 @@ const Index = () => {
     dailySteps: 0
   });
 
-  const [tempWeight, setTempWeight] = useState(USER_INFO.initialWeight);
+  const [tempWeight, setTempWeight] = useState(userProfile.initialWeight);
 
   useEffect(() => {
     const loadDayData = async () => {
-      const docRef = doc(db, "dailyData", today);
+      if (!user) return;
+      
+      const docRef = doc(db, "users", user.uid, "dailyData", today);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
@@ -66,17 +76,32 @@ const Index = () => {
     };
 
     loadDayData();
-  }, [today]);
+  }, [today, user]);
 
   const saveDayData = async (newData: Partial<DayData>) => {
+    if (!user) return;
+    
     const updatedData = { ...dayData, ...newData, date: today };
     setDayData(updatedData);
     
     try {
-      await setDoc(doc(db, "dailyData", today), updatedData);
+      await setDoc(doc(db, "users", user.uid, "dailyData", today), updatedData);
     } catch (error) {
       toast({
         title: "Error saving data",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/auth');
+    } catch (error) {
+      toast({
+        title: "Error logging out",
         description: "Please try again",
         variant: "destructive"
       });
@@ -121,11 +146,16 @@ const Index = () => {
               <Trophy className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">{USER_INFO.name}</h1>
+              <h1 className="text-xl font-bold">{userProfile.name}</h1>
               <p className="text-sm text-muted-foreground">75 Hard Challenge</p>
             </div>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button variant="outline" size="icon" onClick={handleLogout}>
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </header>
 

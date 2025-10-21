@@ -11,6 +11,7 @@ import { Footprints } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { useAuth } from "@/hooks/useAuth";
 
 interface StepsTrackerProps {
   dailySteps: number;
@@ -25,6 +26,7 @@ export const StepsTracker = ({
   onStepsChange,
   currentDate,
 }: StepsTrackerProps) => {
+  const { user } = useAuth();
   const [stepsInput, setStepsInput] = useState<string>("");
   const [totalDeficit, setTotalDeficit] = useState(0);
   const [overallProgress, setOverallProgress] = useState(100);
@@ -35,11 +37,16 @@ export const StepsTracker = ({
 
   useEffect(() => {
     calculateOverallProgress();
-  }, [currentDate]);
+  }, [currentDate, user]);
 
   const calculateOverallProgress = async () => {
+    if (!user) return;
+    
     try {
-      const q = query(collection(db, "dailyData"), orderBy("date"));
+      const q = query(
+        collection(db, "users", user.uid, "dailyData"), 
+        orderBy("date")
+      );
       const querySnapshot = await getDocs(q);
 
       let cumulativeDeficit = 0;

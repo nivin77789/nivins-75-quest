@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Scale, TrendingDown, TrendingUp } from "lucide-react";
-import { USER_INFO } from "@/lib/constants";
+import { useAuth } from "@/hooks/useAuth";
 
 interface WeightTrackerProps {
   currentWeight: number;
@@ -12,12 +12,16 @@ interface WeightTrackerProps {
 }
 
 export const WeightTracker = ({ currentWeight, onWeightUpdate, tempWeight, onTempWeightChange }: WeightTrackerProps) => {
+  const { userProfile } = useAuth();
+  
+  if (!userProfile) return null;
+  
   const calculateBMI = (weight: number) => {
-    const heightInMeters = USER_INFO.height / 100;
+    const heightInMeters = userProfile.height / 100;
     return (weight / (heightInMeters * heightInMeters)).toFixed(1);
   };
 
-  const weightChange = currentWeight - USER_INFO.initialWeight;
+  const weightChange = currentWeight - userProfile.initialWeight;
   const bmi = calculateBMI(currentWeight);
 
   return (
@@ -50,7 +54,7 @@ export const WeightTracker = ({ currentWeight, onWeightUpdate, tempWeight, onTem
             </span>
           </div>
           <div className="text-sm text-muted-foreground">
-            {weightChange < 0 ? 'Lost' : 'Gained'} since start ({USER_INFO.initialWeight} kg)
+            {weightChange < 0 ? 'Lost' : 'Gained'} since start ({userProfile.initialWeight} kg)
           </div>
         </div>
 

@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TaskCheckbox } from "./TaskCheckbox";
 import { Dumbbell, Home } from "lucide-react";
 import { differenceInDays } from "date-fns";
-import { USER_INFO } from "@/lib/constants";
+import { useAuth } from "@/hooks/useAuth";
 
 interface WorkoutPlanProps {
   workouts: Record<string, boolean>;
@@ -31,7 +31,11 @@ const GYM_WORKOUTS = [
 ];
 
 export const WorkoutPlan = ({ workouts, onWorkoutChange, currentDate }: WorkoutPlanProps) => {
-  const dayNumber = differenceInDays(new Date(currentDate), new Date(USER_INFO.startDate)) + 1;
+  const { userProfile } = useAuth();
+  
+  if (!userProfile) return null;
+  
+  const dayNumber = differenceInDays(new Date(currentDate), new Date(userProfile.startDate)) + 1;
   const isHomeWorkout = dayNumber <= 15;
   const workoutList = isHomeWorkout ? HOME_WORKOUTS : GYM_WORKOUTS;
   
@@ -43,7 +47,7 @@ export const WorkoutPlan = ({ workouts, onWorkoutChange, currentDate }: WorkoutP
 
   const currentWeight = 90; // This should come from props
   const targetWeight = 65;
-  const daysRemaining = differenceInDays(new Date(USER_INFO.endDate), new Date(currentDate));
+  const daysRemaining = differenceInDays(new Date(userProfile.endDate), new Date(currentDate));
   const weightToLose = currentWeight - targetWeight;
   const dailyWeightLoss = daysRemaining > 0 ? (weightToLose / daysRemaining).toFixed(2) : 0;
 
