@@ -43,17 +43,12 @@ const Index = () => {
   const navigate = useNavigate();
   const today = format(new Date(), "yyyy-MM-dd");
   
-  if (!userProfile) return null;
-  
-  const dayNumber = differenceInDays(new Date(today), new Date(userProfile.startDate)) + 1;
-  const daysRemaining = differenceInDays(new Date(userProfile.endDate), new Date(today));
-  
   const [dayData, setDayData] = useState<DayData>({
     date: today,
     tasks: {},
     lookmaxingDone: false,
     waterIntake: 0,
-    weight: userProfile.initialWeight,
+    weight: userProfile?.initialWeight || 0,
     notes: "",
     dopamineTasks: {},
     skincareTasks: {},
@@ -61,7 +56,12 @@ const Index = () => {
     dailySteps: 0
   });
 
-  const [tempWeight, setTempWeight] = useState(userProfile.initialWeight);
+  const [tempWeight, setTempWeight] = useState(userProfile?.initialWeight || 0);
+  
+  if (!userProfile) return null;
+  
+  const dayNumber = differenceInDays(new Date(today), new Date(userProfile.startDate)) + 1;
+  const daysRemaining = differenceInDays(new Date(userProfile.endDate), new Date(today));
 
   useEffect(() => {
     const loadDayData = async () => {
