@@ -4,8 +4,6 @@ import { db } from "@/lib/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import { LOOKMAXING_TASKS, MOTIVATIONAL_QUOTES, ATOMIC_HABITS_CONTENT } from "@/lib/constants";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { DailyTasks } from "@/components/DailyTasks";
 import { LookmaxingTask } from "@/components/LookmaxingTask";
 import { WaterTracker } from "@/components/WaterTracker";
@@ -17,12 +15,10 @@ import { DopamineBoost } from "@/components/DopamineBoost";
 import { SkinCare } from "@/components/SkinCare";
 import { WorkoutPlan } from "@/components/WorkoutPlan";
 import { StepsTracker } from "@/components/StepsTracker";
-import { Calendar, Target, Trophy, Flame, LogOut } from "lucide-react";
+import { Calendar, Target, Trophy, Flame } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import confetti from "canvas-confetti";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 
 interface DayData {
   date: string;
@@ -37,10 +33,9 @@ interface DayData {
   dailySteps: number;
 }
 
-const Index = () => {
+export default function SeventyFiveHard() {
   const { toast } = useToast();
-  const { user, userProfile, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user, userProfile } = useAuth();
   const today = format(new Date(), "yyyy-MM-dd");
   
   const [dayData, setDayData] = useState<DayData>({
@@ -96,19 +91,6 @@ const Index = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/auth');
-    } catch (error) {
-      toast({
-        title: "Error logging out",
-        description: "Please try again",
-        variant: "destructive"
-      });
-    }
-  };
-
   const handleTaskChange = (taskId: string, checked: boolean) => {
     const newTasks = { ...dayData.tasks, [taskId]: checked };
     saveDayData({ tasks: newTasks });
@@ -138,30 +120,22 @@ const Index = () => {
   const tasksProgress = (completedTasks / totalTasks) * 100;
 
   return (
-    <div className="min-h-screen  pb-20 relative">
-      <AnimatedBackground />
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-3">
+    <div className="pb-20 relative">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Page Title */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
             <div className="flex items-center justify-center w-12 h-12 rounded-full gradient-primary">
               <Trophy className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">{userProfile.name}</h1>
-              <p className="text-sm text-muted-foreground">75 Hard Challenge</p>
+              <h1 className="text-4xl font-bold">75 Hard Challenge</h1>
+              <p className="text-muted-foreground text-lg">
+                Transform yourself in 75 days
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Button variant="outline" size="icon" onClick={handleLogout}>
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Motivational Quote */}
         <div className="mb-8">
           <MotivationalQuote quote={quote} />
@@ -297,6 +271,4 @@ const Index = () => {
       </div>
     </div>
   );
-};
-
-export default Index;
+}
