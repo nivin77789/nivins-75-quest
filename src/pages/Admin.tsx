@@ -1,10 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Users, Activity, TrendingUp } from "lucide-react";
+import { Shield, Users, Activity, TrendingUp, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function Admin() {
   const { user } = useAuth();
@@ -16,6 +22,15 @@ export default function Admin() {
     activePrograms: 0,
     completedWorkouts: 0
   });
+  const [users, setUsers] = useState<any[]>([]);
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    age: 0,
+    height: 0,
+    initialWeight: 0
+  });
+  const { toast } = useToast();
 
   useEffect(() => {
     const checkAdminAccess = async () => {
@@ -34,8 +49,14 @@ export default function Admin() {
 
         setIsAdmin(true);
         
-        // Fetch admin stats
+        // Fetch admin stats and users
         const usersSnapshot = await getDocs(collection(db, "userProfiles"));
+        const usersData = usersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        setUsers(usersData);
         setStats({
           totalUsers: usersSnapshot.size,
           activePrograms: 12,
@@ -51,6 +72,63 @@ export default function Admin() {
 
     checkAdminAccess();
   }, [user, navigate]);
+
+  const handleEditUser = (user: any) => {
+    setEditingUser(user);
+    setEditForm({
+      name: user.name,
+      age: user.age,
+      height: user.height,
+      initialWeight: user.initialWeight
+    });
+  };
+
+  const handleUpdateUser = async () => {
+    if (!editingUser) return;
+
+    try {
+      await updateDoc(doc(db, "userProfiles", editingUser.id), editForm);
+      
+      setUsers(users.map(u => 
+        u.id === editingUser.id ? { ...u, ...editForm } : u
+      ));
+      
+      toast({
+        title: "User updated",
+        description: "User profile has been updated successfully"
+      });
+      
+      setEditingUser(null);
+    } catch (error) {
+      toast({
+        title: "Error updating user",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      await deleteDoc(doc(db, "userProfiles", userId));
+      
+      setUsers(users.filter(u => u.id !== userId));
+      setStats(prev => ({ ...prev, totalUsers: prev.totalUsers - 1 }));
+      
+      toast({
+        title: "User deleted",
+        description: "User has been removed successfully"
+      });
+    } catch (error) {
+      toast({
+        title: "Error deleting user",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -118,56 +196,111 @@ export default function Admin() {
         </Card>
       </div>
 
-      {/* Admin Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="card-shadow">
-          <CardHeader>
-            <CardTitle>User Management</CardTitle>
-            <CardDescription>View and manage user accounts</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Access user profiles, manage roles, and monitor activity
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow">
-          <CardHeader>
-            <CardTitle>Content Management</CardTitle>
-            <CardDescription>Manage workouts and programs</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Add, edit, or remove workout programs and content
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow">
-          <CardHeader>
-            <CardTitle>Analytics</CardTitle>
-            <CardDescription>View platform performance metrics</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Track user engagement, popular workouts, and growth trends
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow">
-          <CardHeader>
-            <CardTitle>System Settings</CardTitle>
-            <CardDescription>Configure platform settings</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Manage notifications, features, and system configurations
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Users Management Table */}
+      <Card className="card-shadow">
+        <CardHeader>
+          <CardTitle>User Management</CardTitle>
+          <CardDescription>View and manage all registered users</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Age</TableHead>
+                <TableHead>Height (cm)</TableHead>
+                <TableHead>Weight (kg)</TableHead>
+                <TableHead>Start Date</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.age}</TableCell>
+                  <TableCell>{user.height}</TableCell>
+                  <TableCell>{user.initialWeight}</TableCell>
+                  <TableCell>{user.startDate}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleEditUser(user)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit User</DialogTitle>
+                            <DialogDescription>
+                              Update user profile information
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="name">Name</Label>
+                              <Input
+                                id="name"
+                                value={editForm.name}
+                                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="age">Age</Label>
+                              <Input
+                                id="age"
+                                type="number"
+                                value={editForm.age}
+                                onChange={(e) => setEditForm({ ...editForm, age: parseInt(e.target.value) })}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="height">Height (cm)</Label>
+                              <Input
+                                id="height"
+                                type="number"
+                                value={editForm.height}
+                                onChange={(e) => setEditForm({ ...editForm, height: parseInt(e.target.value) })}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="weight">Initial Weight (kg)</Label>
+                              <Input
+                                id="weight"
+                                type="number"
+                                value={editForm.initialWeight}
+                                onChange={(e) => setEditForm({ ...editForm, initialWeight: parseInt(e.target.value) })}
+                              />
+                            </div>
+                            <Button onClick={handleUpdateUser} className="w-full">
+                              Update User
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

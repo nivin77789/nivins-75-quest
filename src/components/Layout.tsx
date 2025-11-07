@@ -16,7 +16,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/auth');
+      navigate('/');
     } catch (error) {
       toast({
         title: "Error logging out",

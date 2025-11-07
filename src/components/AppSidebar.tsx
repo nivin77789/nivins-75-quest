@@ -17,7 +17,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 const mainItems = [
-  { title: "Dashboard", url: "/", icon: Home },
+  { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "Workouts", url: "/workouts", icon: Dumbbell },
   { title: "Nutrition", url: "/nutrition", icon: Apple },
   { title: "Programs", url: "/programs", icon: Calendar },
