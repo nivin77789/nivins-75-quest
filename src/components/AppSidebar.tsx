@@ -107,7 +107,7 @@ export function AppSidebar() {
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
                     <NavLink
-                      to="/admin"
+                      to="/admin/dashboard"
                       className={({ isActive }) =>
                         isActive
                           ? "bg-muted text-primary font-medium"

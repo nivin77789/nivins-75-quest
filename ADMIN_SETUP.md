@@ -2,13 +2,17 @@
 
 This guide explains how to set up admin users in your Cult.fit clone application using Firebase.
 
-## Default Admin Credentials
+## Admin Access
 
-For quick testing, you can create an admin user with these credentials:
-- **Email**: admin@admin.com
+The admin panel can be accessed at `/admin` with the following credentials:
+- **Username**: admin
 - **Password**: admin
 
-Follow the steps below to set up this admin user.
+This will authenticate using Firebase with the email `admin@admin.com`.
+
+## Setup Instructions
+
+Follow the steps below to set up the admin user in Firebase.
 
 ## Creating an Admin User
 

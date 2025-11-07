@@ -43,7 +43,7 @@ export default function Admin() {
         const roleDoc = await getDoc(doc(db, "userRoles", user.uid));
         
         if (!roleDoc.exists() || roleDoc.data().role !== "admin") {
-          navigate('/');
+          navigate('/admin');
           return;
         }
 
@@ -64,7 +64,7 @@ export default function Admin() {
         });
       } catch (error) {
         console.error("Error checking admin access:", error);
-        navigate('/');
+        navigate('/admin');
       } finally {
         setLoading(false);
       }
