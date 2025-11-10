@@ -3,13 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Shield } from "lucide-react";
+import { Shield, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
-import { doc, getDoc } from "firebase/firestore";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { z } from "zod";
 
 const adminLoginSchema = z.object({
@@ -24,7 +22,7 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate input
@@ -40,48 +38,40 @@ export default function AdminLogin() {
 
     setLoading(true);
 
-    try {
-      // Convert username to email format for Firebase
-      const email = `${username}@admin.com`;
-      
-      // Authenticate with Firebase
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Check if user has admin role
-      const roleDoc = await getDoc(doc(db, "userRoles", userCredential.user.uid));
-      
-      if (!roleDoc.exists() || roleDoc.data().role !== "admin") {
-        await auth.signOut();
+    // Frontend-only authentication (NOT SECURE FOR PRODUCTION)
+    setTimeout(() => {
+      if (username === "admin" && password === "admin") {
+        // Store admin session
+        sessionStorage.setItem("adminAuthenticated", "true");
+        
         toast({
-          title: "Access denied",
-          description: "You don't have admin privileges",
+          title: "Welcome Admin",
+          description: "Successfully logged in"
+        });
+
+        navigate("/admin/dashboard");
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Invalid username or password",
           variant: "destructive"
         });
-        setLoading(false);
-        return;
       }
-
-      toast({
-        title: "Welcome Admin",
-        description: "Successfully logged in"
-      });
-
-      navigate("/admin/dashboard");
-    } catch (error: any) {
-      toast({
-        title: "Login failed",
-        description: "Invalid username or password",
-        variant: "destructive"
-      });
-    } finally {
       setLoading(false);
-    }
+    }, 500);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       <AnimatedBackground />
       
+      <Alert variant="destructive" className="w-full max-w-md mb-4 relative z-10">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          Warning: This uses frontend-only authentication and is NOT secure for production use.
+        </AlertDescription>
+      </Alert>
+
       <Card className="w-full max-w-md card-shadow relative z-10">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full gradient-primary flex items-center justify-center">

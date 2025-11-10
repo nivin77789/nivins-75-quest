@@ -1,8 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Users, Activity, TrendingUp, Pencil, Trash2 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Shield, Users, Activity, TrendingUp, Pencil, Trash2, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
-import { doc, getDoc, collection, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,9 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function Admin() {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -34,21 +31,15 @@ export default function Admin() {
 
   useEffect(() => {
     const checkAdminAccess = async () => {
-      if (!user) {
-        navigate('/auth');
+      // Check frontend session
+      const isAuthenticated = sessionStorage.getItem("adminAuthenticated");
+      
+      if (!isAuthenticated) {
+        navigate('/admin');
         return;
       }
 
       try {
-        const roleDoc = await getDoc(doc(db, "userRoles", user.uid));
-        
-        if (!roleDoc.exists() || roleDoc.data().role !== "admin") {
-          navigate('/admin');
-          return;
-        }
-
-        setIsAdmin(true);
-        
         // Fetch admin stats and users
         const usersSnapshot = await getDocs(collection(db, "userProfiles"));
         const usersData = usersSnapshot.docs.map(doc => ({
@@ -63,15 +54,14 @@ export default function Admin() {
           completedWorkouts: 156
         });
       } catch (error) {
-        console.error("Error checking admin access:", error);
-        navigate('/admin');
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     checkAdminAccess();
-  }, [user, navigate]);
+  }, [navigate]);
 
   const handleEditUser = (user: any) => {
     setEditingUser(user);
@@ -130,6 +120,11 @@ export default function Admin() {
     }
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("adminAuthenticated");
+    navigate("/admin");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -141,20 +136,22 @@ export default function Admin() {
     );
   }
 
-  if (!isAdmin) {
-    return null;
-  }
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8 flex items-center gap-3">
-        <Shield className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-4xl font-bold">Admin Panel</h1>
-          <p className="text-muted-foreground text-lg">
-            Manage users and view platform analytics
-          </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Shield className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-4xl font-bold">Admin Panel</h1>
+            <p className="text-muted-foreground text-lg">
+              Manage users and view platform analytics
+            </p>
+          </div>
         </div>
+        <Button variant="outline" onClick={handleLogout} className="gap-2">
+          <LogOut className="h-4 w-4" />
+          Logout
+        </Button>
       </div>
 
       {/* Stats Overview */}
