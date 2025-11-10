@@ -45,7 +45,7 @@ const Auth = () => {
         title: "Welcome back!",
         description: "Successfully logged in.",
       });
-      navigate('/');
+      // Navigation handled by useEffect when user state updates
     } catch (error: any) {
       toast({
         title: "Login failed",
@@ -77,7 +77,7 @@ const Auth = () => {
         title: "Account created!",
         description: "Your 75 Hard journey begins now!",
       });
-      navigate('/');
+      // Navigation handled by useEffect when user state updates
     } catch (error: any) {
       toast({
         title: "Signup failed",
