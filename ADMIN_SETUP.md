@@ -12,19 +12,33 @@ This will authenticate using Firebase with the email `admin@admin.com`.
 
 ## Setup Instructions
 
-Follow the steps below to set up the admin user in Firebase.
+Follow these steps to set up the admin user in Firebase.
 
-## Creating an Admin User
-
-To grant admin access to a user, you need to add a document to the `userRoles` collection in Firestore.
-
-### Steps:
+## Step 1: Create Firebase Authentication User
 
 1. **Go to Firebase Console**
    - Navigate to [Firebase Console](https://console.firebase.google.com/)
    - Select your project
 
-2. **Open Firestore Database**
+2. **Open Authentication**
+   - Click on "Authentication" in the left sidebar
+   - Click on "Users" tab
+   - Click "Add user" button
+
+3. **Create Admin User**
+   - Email: `admin@admin.com`
+   - Password: `admin`
+   - Click "Add user"
+
+4. **Copy the User UID**
+   - After creating the user, copy their UID from the Users list
+   - You'll need this for Step 2
+
+## Step 2: Grant Admin Role
+
+Now add the admin role to the user you just created.
+
+1. **Open Firestore Database**
    - Click on "Firestore Database" in the left sidebar
    - Click on "Start collection" if this is your first collection
 
@@ -32,13 +46,17 @@ To grant admin access to a user, you need to add a document to the `userRoles` c
    - Collection ID: `userRoles`
    - Click "Next"
 
-4. **Add an Admin User Document**
-   - Document ID: `<user-uid>` (Use the UID of the user you want to make admin)
+4. **Add the Admin Role Document**
+   - Document ID: Paste the UID you copied from Step 1
    - Add field:
      - Field: `role`
      - Type: `string`
      - Value: `admin`
    - Click "Save"
+
+That's it! You can now log in at `/admin` with:
+- **Username**: admin
+- **Password**: admin
 
 ### Finding User UID:
 
