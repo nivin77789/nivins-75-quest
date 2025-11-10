@@ -3,11 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Shield, AlertTriangle } from "lucide-react";
+import { Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { z } from "zod";
 
 const adminLoginSchema = z.object({
@@ -65,13 +64,6 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       <AnimatedBackground />
       
-      <Alert variant="destructive" className="w-full max-w-md mb-4 relative z-10">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Warning: This uses frontend-only authentication and is NOT secure for production use.
-        </AlertDescription>
-      </Alert>
-
       <Card className="w-full max-w-md card-shadow relative z-10">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full gradient-primary flex items-center justify-center">
